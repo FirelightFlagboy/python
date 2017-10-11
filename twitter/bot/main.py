@@ -35,6 +35,10 @@ def ft_search_tweet(ph, count=10):
 	return the result of the search of tweet
 	that match ph
 	count is the nb max of match to be return
+	twitter.search(q="your phrase to be search", count="nb max of match",
+	geocode="longitude,etc", lang="language", locale="query's language"
+	result_type="recent,etc", until="before date", since_id="more recent than this tweet",
+	max_id="older than this tweet", includes_entities="")
 	"""
 	return twitter.search(q=ph, count=count)
 
