@@ -30,6 +30,17 @@ def ft_retweet(url):
 	except TwythonError as e:
 		print(e)
 
+def ft_favorite(url):
+	"""fav the post at the url given in params"""
+	try:
+		ids = url.split("/")
+		twitter.create_favorite(id=ids[-1])
+		sleep(1)
+	except Exception as e:
+		print(e)
+	except TwythonError as e:
+		print(e)
+
 def ft_search_tweet(ph, count=10):
 	"""
 	return the result of the search of tweet
@@ -57,13 +68,25 @@ def ft_auto_retweet(ph, count=10):
 	"""
 	search = ft_search_tweet(ph, count)
 	try:
-		for tweet in search_result["statuses"]:
+		for tweet in search["statuses"]:
 			ft_retweet(tweet["id_str"])
 	except Exception as e:
 		print(e)
 
+def ft_auto_fav(ph, count=10):
+	"""
+	auto fav tweet that match ph
+	count is the nb max to be fav
+	"""
+	search = ft_search_tweet(ph, count)
+	try:
+		for tweet in search["statuses"]:
+			ft_favorite(tweet["id_str"])
+	except Exception as e:
+		print(e)
+
 def main():
-	ft_show_tweet(ft_search_tweet("FireFlagboy", 1000))
+	ft_show_tweet(ft_search_tweet("Fireflagboy", 10))
 
 if __name__ == '__main__':
 	""" call the main() function"""
