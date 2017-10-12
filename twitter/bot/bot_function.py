@@ -1,14 +1,30 @@
 #coding:utf-8
 # Importing the module twython
 from twython import Twython
-from time import sleep
+from time import sleep,time
 from twitter_info import *
 import sys
 
 #Prepare your twitter, you will need it for everything
-twitter = Twython(ft_get_appkey(), ft_get_appsecret(),\
-		ft_get_oauthtoken(), ft_get_oauthsecret())
+twitter = 0
 #The above should just be a single line, without the break
+def ft_connect_twitter():
+	"""
+	connect the global var 'twitter' to twitter api
+	"""
+	global twitter
+	twitter = Twython(ft_get_appkey(), ft_get_appsecret(),\
+			ft_get_oauthtoken(), ft_get_oauthsecret())
+
+def ft_reset_limit_rate():
+	"""
+	wait the time the reset the rate when to much
+	request is done
+	"""
+	remainder = float(twitter.get_lastfunction_header(header='x-rate-limit-reset')) - time()
+	print(remainder)
+	sleep(remainder)
+	ft_connect_twitter()
 
 def ft_post_twt(status):
 	"""post the str in status to the twitter profile linked"""
@@ -20,7 +36,9 @@ def ft_post_twt(status):
 		print(e)
 
 def ft_retweet(url):
-	"""retweet the post at the url give in params"""
+	"""
+	retweet the post at the url give in params
+	"""
 	try:
 		ids = url.split("/")
 		twitter.retweet(id=ids[-1])
@@ -31,7 +49,9 @@ def ft_retweet(url):
 		print(e)
 
 def ft_favorite(url):
-	"""fav the post at the url given in params"""
+	"""
+	fav the post at the url given in params
+	"""
 	try:
 		ids = url.split("/")
 		twitter.create_favorite(id=ids[-1])
@@ -75,7 +95,6 @@ def ft_auto_retweet(ph, count=10):
 
 def ft_auto_fav(ph, count=10):
 	"""
-	auto fav tweet that match ph
 	count is the nb max to be fav
 	"""
 	search = ft_search_tweet(ph, count)
@@ -86,7 +105,7 @@ def ft_auto_fav(ph, count=10):
 		print(e)
 
 def main():
-	ft_show_tweet(ft_search_tweet("Fireflagboy", 10))
+	pass
 
 if __name__ == '__main__':
 	""" call the main() function"""
