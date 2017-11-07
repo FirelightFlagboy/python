@@ -2,6 +2,7 @@
 
 from bot_function import *
 from data_file import *
+from twitter_info import *
 from time import sleep
 import random
 
@@ -29,7 +30,9 @@ def ft_sleep(hour=0, minu=0, sec=0):
 	"""
 	simple improved sleep funtion
 	"""
-	sleep(hour*3600 + minu*60 + sec)
+	time_to_wait = hour*3600 + minu*60 + sec
+	print("wait {} sec".format(time_to_wait))
+	sleep(time_to_wait)
 
 def main():
 	"""
@@ -40,8 +43,9 @@ def main():
 	ls = ft_get_list()
 	while True:
 		src = ft_get_rand_quote(ls)
+		ft_auto_retweet("Playwarframe", count=10, result_type="people")
 		ft_post_twt(src)
-		ft_sleep(sec=10)
+		ft_sleep(hour=1)
 
 if __name__ == '__main__':
 	"""

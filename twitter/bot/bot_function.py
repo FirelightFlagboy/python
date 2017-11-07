@@ -1,7 +1,7 @@
 #coding:utf-8
 # Importing the module twython
 from twython import Twython
-from time import sleep,time
+from time import sleep, time, strftime
 from twitter_info import *
 import sys
 
@@ -31,7 +31,7 @@ def ft_post_twt(status):
 	try:
 		twitter.update_status(status=status)
 		sleep(1)
-		print("published :{}".format(status))
+		print("{} publish :\n{}".format(strftime("%d/%m/%y %H:%M:%S"),status))
 	except Exception as e:
 		print(e)
 
@@ -61,7 +61,7 @@ def ft_favorite(url):
 	except TwythonError as e:
 		print(e)
 
-def ft_search_tweet(ph, count=10):
+def ft_search_tweet(ph, count=10, result_type="recent"):
 	"""
 	return the result of the search of tweet
 	that match ph
@@ -71,7 +71,7 @@ def ft_search_tweet(ph, count=10):
 	result_type="recent,etc", until="before date", since_id="more recent than this tweet",
 	max_id="older than this tweet", includes_entities="")
 	"""
-	return twitter.search(q=ph, count=count)
+	return twitter.search(q=ph, count=count, result_type=result_type)
 
 def ft_show_tweet(result):
 	"""
@@ -81,12 +81,12 @@ def ft_show_tweet(result):
 	for i, tweet in enumerate(result["statuses"]):
 		print("tweet {}:\n{}\n".format(i + 1,tweet["text"]), file=utf8stdout)
 
-def ft_auto_retweet(ph, count=10):
+def ft_auto_retweet(ph, count=10, result_type="recent"):
 	"""
 	auto retweet tweet that match ph
 	count is the nb max to be retweet
 	"""
-	search = ft_search_tweet(ph, count)
+	search = ft_search_tweet(ph, count, result_type)
 	try:
 		for tweet in search["statuses"]:
 			ft_retweet(tweet["id_str"])
