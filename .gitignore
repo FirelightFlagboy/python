@@ -2,3 +2,11 @@ twitter/twython*
 twitter/bot/twitter_info.py
 twitter/bot/__py*
 twitter/bot/quote.txt
+*.mp4
+*.m4a
+*secret*
+*.mp3
+*.traces
+*.log
+*.pyc
+bot/youtube_bot/youtube_dl/*
