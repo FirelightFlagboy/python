@@ -14,6 +14,7 @@ def main():
 		except (TypeError, ValueError, AssertionError) as e:
 			error = 1
 			print("Error :", e)
+			continue
 	for i in range(2, math.ceil(math.sqrt(nb))+1):
 		print(i, nb, sep=":")
 		if nb % i == 0 and i != nb:
