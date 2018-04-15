@@ -1,6 +1,6 @@
 import argparse
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(description="square the number x")
 
 parser.add_argument("x", help="le nombre a mettre au carré", type=int)
 parser.add_argument("-v", "--verbose", action="store_true",
