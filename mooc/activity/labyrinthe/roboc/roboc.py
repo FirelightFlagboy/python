@@ -55,7 +55,7 @@ while 1:
 				if choix >= 1 and choix <= nbCarte:
 					break
 			except TypeError as e:
-				raise e("Erreur: impossible de convertir la valeur choix >{} en int".format(choix))
+				raise ValueError("Erreur: impossible de convertir la valeur choix >{} en int".format(choix))
 			choix = " "
 
 
@@ -73,7 +73,7 @@ while 1:
 	choix -= 1
 	lab = Labyrinthe(cartes[choix].labyrinthe)
 
-	#une fois que le joueur a choisi sa carte, 
+	#une fois que le joueur a choisi sa carte,
 	#on peut commencer a jouer
 
 	ex = r"^[newsQq]([1-9][0-9]*)?$"
@@ -120,7 +120,7 @@ while 1:
 		print("Bravo,vous avez gagné")
 		#on supprime le ficher 'last_save.txt' car on n'en a plus besoin
 		os.remove(chemin)
-	while len(choix) < 3choix not in "oui" and choix not in "non" and len(choix) < 3:
+	while len(choix) < 3 and choix not in "oui" and choix not in "non" and len(choix) > 3:
 			choix = input("voulez-vous faire une autre partie ?\noui/non\n>")
 			choix = choix.lower()
 
