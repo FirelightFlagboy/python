@@ -1,5 +1,5 @@
 OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
-OX  O   O   O   O   O   O   O   O   O   O   O
+O   O   O   O   O   O   O   O   O   O   O   O
 O   O   O   O   O   O   O   O   O   O   O   O
 O   O   .   .   .   .   O   .   .   .   .   O
 O.OOOO.OOOOOOOOOOOOOOOOOOOOOOO.OOO.OOO.OOOOOO

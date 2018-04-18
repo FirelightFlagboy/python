@@ -1,10 +1,12 @@
-class Carte:
+class Carte():
 
 	"""Objet de transition entre un fichier et un labyrinthe."""
 
 
 	def __init__(self, nom, chaine):
 		self.nom = nom
+		self.map = chaine
+		self.nb_line = self.map.count('\n')
 		self.labyrinthe = self.convStrToLabyrinthe(chaine)
 
 	def __repr__(self):
@@ -27,5 +29,8 @@ class Carte:
 
 				ligne += 1
 			return dic
+
+	def __str__(self):
+		return self.map
 
 	convStrToLabyrinthe = staticmethod(convStrToLabyrinthe)
