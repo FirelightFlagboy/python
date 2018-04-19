@@ -3,6 +3,7 @@ import sys
 import re
 from Carte import Carte
 
+
 class Maps():
 	"""
 	classe qui permet de recurpere les maps d'un dossier choisi
@@ -26,7 +27,7 @@ class Maps():
 		"""
 		# si il n'y a aucune maps alors on quite
 		if self.nb_carte <= 0:
-			print("no maps found")
+			print("no map found", file=sys.stderr)
 			sys.exit(1)
 		print("Labytinthes existant :")
 		for i, carte in enumerate(self.maps):
@@ -36,6 +37,7 @@ class Maps():
 		"""
 		demande a l'utilisateur de choisir une map parmi celle qui existe
 		"""
+		self.nb_carte = len(self.maps)
 		self.displayMenu()
 		choice = ""
 		while 1:
@@ -45,7 +47,8 @@ class Maps():
 				index = int(choice)
 				if index >= 1 and index <= self.nb_carte:
 					break
-				raise ValueError("Erreur le choix doit etre compris entre 1 et {}".format(self.nb_carte))
+				raise ValueError(
+					"Erreur le choix doit etre compris entre 1 et {}".format(self.nb_carte), file=sys.stderr)
 			except Exception as e:
 				print(e)
 			choice = ""
@@ -58,16 +61,25 @@ class Maps():
 			self.maps.extend(self.searchFormDir(rep))
 		self.nb_carte = len(self.maps)
 
+	def isMapContentOk(self, map):
+		if re.search(self.ex_content, map) is None:
+			return False
+		if "U" not in map:
+			return False
+		if " " not in map:
+			return False
+		return True
+
 	def searchFormDir(self, repertoire):
 		"""
 		fonction qui lit un repertoire et recuper tout les maps compatible
 		"""
 		# check if the current working dir exist and is a directory
-		if os.path.exists(repertoire) == False:
-			print("{} doesn't exist".format(repertoire))
+		if os.path.exists(repertoire) is False:
+			print("{} doesn't exist".format(repertoire), file=sys.stderr)
 			return []
-		if os.path.isdir(repertoire) == False:
-			print("{} not a directory".format(repertoire))
+		if os.path.isdir(repertoire) is False:
+			print("{} not a directory".format(repertoire), file=sys.stderr)
 			return []
 		# if all test pass then work on this repertoire and add the map found to the list map
 		maps = []
@@ -78,6 +90,6 @@ class Maps():
 				nameMap = nameFile[:-4].lower()
 				with open(path, "r") as mapFile:
 					content = mapFile.read()
-					if re.search(self.ex_content, content):
+					if self.isMapContentOk(content):
 						maps.append(Carte(nameMap, content))
 		return maps

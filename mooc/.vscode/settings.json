@@ -1,5 +1,15 @@
 {
 	"python.pythonPath": "D:\\Program Files\\Anaconda3\\python.exe",
 	"python.linting.enabled": true,
-	"python.linting.pylintPath": "D:\\Program Files\\Anaconda3\\Scripts\\pylint"
+	"python.linting.pylintPath": "D:\\Program Files\\Anaconda3\\Scripts\\pylint",
+	"python.linting.pylintEnabled": true,
+	"python.linting.flake8Enabled": false,
+	"python.linting.pep8Enabled": false,
+	"python.formatting.autopep8Args": [
+		"--ignore=W191"
+	],
+	"python.linting.pep8Args": [
+		"--ignore=W191,E402",
+		"--max-line-length=120"
+	]
 }
