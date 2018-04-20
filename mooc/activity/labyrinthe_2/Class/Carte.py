@@ -6,8 +6,7 @@ class Carte():
 	def __init__(self, nom, chaine):
 		self.nom = nom
 		self.map = chaine
-		self.nb_line = self.map.count('\n')
-		self.labyrinthe = self.convStrToLabyrinthe(chaine)
+		self.nb_line, self.labyrinthe = self.convStrToLabyrinthe(chaine)
 
 	def __repr__(self):
 		return "<Carte {}>".format(self.nom)
@@ -16,19 +15,19 @@ class Carte():
 			"""fonction qui creer un dictionnaire avec les
 			coordonnée de chaque 'case' et de son 'type'"""
 			dic = {}
-			ligne = 1
-			colonne = 1
+			lig = 1
+			col = 1
 			for char in chaine:	#on lit la chaine char par char
 				#on test chaque characteres pour affecter le bon type au dictionnaire
 
 				if char in '\n': #quand on attiend la fin de la ligne, on change de colonne
-					colonne += 1
-					ligne = 0
+					lig += 1
+					col = 0
 				else:
-					dic[colonne,ligne] = char
+					dic[lig,col] = char
 
-				ligne += 1
-			return dic
+				col += 1
+			return (lig, dic)
 
 	def __str__(self):
 		return self.map
