@@ -1,7 +1,7 @@
 import unittest
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/' + '../Class'))
+sys.path.append(os.path.abspath(ospath.dirname(__file__) + '/' + '../Class'))
 from Class.Carte import Carte
 
 class CarteTest(unittest.TestCase):
