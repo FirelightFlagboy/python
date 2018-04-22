@@ -16,6 +16,10 @@ class CarteTest(unittest.TestCase):
 			"fullmap" :
 				"OOOOOOOO\n"
 				"O     UO\n"
+				"OOOOOOOO",
+			"fullmapDoor" :
+				"OOOOOOOO\n"
+				"O .   UO\n"
 				"OOOOOOOO"
 		}
 
@@ -50,6 +54,23 @@ class CarteTest(unittest.TestCase):
 		self.assertEqual(self.carte["sixNl"].labyrinthe, sixNl)
 		self.assertEqual(self.carte["fullmap"].labyrinthe, fullmap)
 
+	def testPickRandomLocation(self):
+		"""
+		Test la methode pour obtenir une coordonnée libre
+		"""
+		coordZero = self.carte["zeroNl"].pickRandomLocation()
+		coordfive = self.carte["sixNl"].pickRandomLocation()
+		coordfull = self.carte["fullmap"].pickRandomLocation()
+
+		# vu que les 2 premier map n'ont pas deplacement libre
+		# les coordonnée renvoie doivent etre null
+		self.assertIsNone(coordZero)
+		self.assertIsNone(coordfive)
+		# on verifie si les coordonnée sont bien register dans le dictionnaire
+		self.assertIn(coordfull, self.carte["fullmap"].labyrinthe)
+		# puis si la val qui se trouve a la key est bien un espace vide
+		self.assertEqual(self.carte["fullmap"].labyrinthe[coordfull], " ")
+
 	def test__str__(self):
 		"""
 		Test la methode __str__
@@ -66,3 +87,47 @@ class CarteTest(unittest.TestCase):
 		for key, val in self.carte.items():
 			so = "<Carte " + key + ">"
 			self.assertEqual(so, val.__repr__())
+
+	def testRobotCanMove(self):
+		"""
+		verifie la methode robotCanMove
+		"""
+		fullmap = self.carte["fullmap"]
+		coord1 = (2, 1)
+		coord2 = (2, 2)
+		coord3 = (1, 4)
+		# test toute les directions
+		# les coord1 et 3 sont toujours fausse
+		for l in "nsew":
+			self.assertFalse(fullmap.actionOk(coord1, l, l, 1))
+			self.assertFalse(fullmap.actionOk(coord3, l, l, 1))
+
+		# pour la coord2 le robot peut seulement se deplacer a l'est
+		# sur 6 case en content celle de depart
+		self.assertFalse(fullmap.actionOk(coord2, "n", "n", 1))
+		self.assertFalse(fullmap.actionOk(coord2, "s", "s", 1))
+		self.assertFalse(fullmap.actionOk(coord2, "o", "o", 1))
+
+		self.assertTrue(fullmap.actionOk(coord2, "e", "e", 1))
+		self.assertTrue(fullmap.actionOk(coord2, "e", "e", 5))
+
+	def testRobotCanWork(self):
+		"""
+		verifie la methode robotCanWork
+		"""
+		fullmapDoor = self.carte["fullmapDoor"]
+		coord = (2, 2)
+		# test la methode murer
+		# le nord, sud, ouest correspond a des murs sur la map
+		self.assertFalse(fullmapDoor.actionOk(coord, "m", "n"))
+		self.assertFalse(fullmapDoor.actionOk(coord, "m", "s"))
+		self.assertFalse(fullmapDoor.actionOk(coord, "m", "o"))
+		# la porte se trouve a l'est du robot
+		self.assertTrue(fullmapDoor.actionOk(coord, "m", "e"))
+
+		# le nord, sud, ouest correspond a des murs sur la map
+		self.assertTrue(fullmapDoor.actionOk(coord, "p", "n"))
+		self.assertTrue(fullmapDoor.actionOk(coord, "p", "s"))
+		self.assertTrue(fullmapDoor.actionOk(coord, "p", "o"))
+		# la porte se trouve a l'est du robot
+		self.assertFalse(fullmapDoor.actionOk(coord, "p", "e"))

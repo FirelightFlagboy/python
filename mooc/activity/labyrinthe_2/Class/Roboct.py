@@ -19,3 +19,33 @@ class Robot(RobotAction):
 		self.direction = None
 		self.remain = 0
 
+	def needMovement(self):
+		"""
+		methode qui renvoie vraie si le robot a besoin de commande de la part de
+		l'utilisateur
+		"""
+		if self.action is None or self.direction is None or self.remain is 0:
+			return True
+		return False
+
+	# a deplacer dans le client
+	def checkCommande(self):
+		"""
+		methode qui check si la commande est bien formater
+		"""
+		pass
+
+	def checkMovement(self);
+		"""
+		methode qui check si le movement est possible
+		"""
+		pass
+
+	def setMovement(self, commande):
+		"""
+		methode qui set la commande saisi par l'utilisateur
+		sur le robot
+		"""
+		pass
+
+
