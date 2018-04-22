@@ -39,7 +39,13 @@ class CarteTest(unittest.TestCase):
 			(1, 5) : "O",
 			(1, 6) : "O"
 		}
-		sixNl = {}
+		sixNl = {
+			(1, 1) : "\n",
+			(2, 1) : "\n",
+			(3, 1) : "\n",
+			(4, 1) : "\n",
+			(5, 1) : "\n"
+		}
 		fullmap = {
 			(1, 1) : "O", (2, 1) : "O", (3, 1) : "O",
 			(1, 2) : "O", (2, 2) : " ", (3, 2) : "O",
@@ -49,6 +55,7 @@ class CarteTest(unittest.TestCase):
 			(1, 6) : "O", (2, 6) : " ", (3, 6) : "O",
 			(1, 7) : "O", (2, 7) : "U", (3, 7) : "O",
 			(1, 8) : "O", (2, 8) : "O", (3, 8) : "O",
+			(1, 9) : "\n", (2, 9) : "\n"
 		}
 		self.assertEqual(self.carte["zeroNl"].labyrinthe, zeroNl)
 		self.assertEqual(self.carte["sixNl"].labyrinthe, sixNl)
@@ -131,3 +138,38 @@ class CarteTest(unittest.TestCase):
 		self.assertTrue(fullmapDoor.actionOk(coord, "p", "o"))
 		# la porte se trouve a l'est du robot
 		self.assertFalse(fullmapDoor.actionOk(coord, "p", "e"))
+
+	def testBuildWall(self):
+		"""
+		verifie la methode testBuildWall
+		"""
+		fullmapDoor = self.carte["fullmapDoor"]
+		coord = (2, 3)
+		res = "OOOOOOOO\nO O   UO\nOOOOOOOO"
+
+		# la fonction renvoie true si elle a placer un mur
+		self.assertTrue(fullmapDoor.buildWall(coord))
+		# si le mur est bien placer alors la map a du changer
+		self.assertEqual(fullmapDoor.__str__(), res)
+
+		# sinon elle renvoie false si il ne s'agit pas d'une porte
+		self.assertFalse(fullmapDoor.buildWall(coord))
+		self.assertEqual(fullmapDoor.__str__(), res)
+
+	def testBuildDoor(self):
+		"""
+		verifie la methode testBuildDoor
+		"""
+		fullmapDoor = self.carte["fullmapDoor"]
+		res = "O.OOOOOO\n. .   UO\nO.OOOOOO"
+		lst = [(1, 2), (2, 1), (3, 2)]
+
+		# la fonction renvoie true si elle a placer une porte
+		for l in lst:
+			self.assertTrue(fullmapDoor.buildDoor(l))
+
+		# sinon elle renvoie false si il ne s'agit pas d'un mur
+		self.assertFalse(fullmapDoor.buildDoor((2, 2)))
+		self.assertFalse(fullmapDoor.buildDoor((2, 3)))
+		self.assertEqual(fullmapDoor.__str__(), res)
+

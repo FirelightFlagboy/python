@@ -8,8 +8,14 @@ class Carte(RobotAction):
 
 	def __init__(self, nom, chaine):
 		self.nom = nom
-		self.map = chaine
 		self.nb_line, self.labyrinthe = self.convStrToLabyrinthe(chaine)
+		# vecteur de direction
+		self._vecteurDirection = {
+			"n":(-1, 0),
+			"s":( 1, 0),
+			"e":( 0, 1),
+			"o":( 0,-1)
+		}
 
 	def convStrToLabyrinthe(chaine):
 			"""fonction qui creer un dictionnaire avec les
@@ -19,12 +25,10 @@ class Carte(RobotAction):
 			col = 1
 			for char in chaine:	#on lit la chaine char par char
 				#on test chaque characteres pour affecter le bon type au dictionnaire
+				dic[lig, col] = char
 				if char in '\n': #quand on atteind la fin de la ligne, on change de ligne
 					lig += 1
 					col = 0
-				else:
-					dic[lig, col] = char
-
 				col += 1
 
 			return (lig, dic)
@@ -79,21 +83,44 @@ class Carte(RobotAction):
 		methode qui renvoie vraie si une action commit par un robot
 		est possible
 		"""
-		dd = {
-			"n":(-1, 0),
-			"s":( 1, 0),
-			"e":( 0, 1),
-			"o":( 0, -1)
-		}
 		if action in "nseo":
-			return self.robotCanMove(coord, count, dd[direction])
+			return self.robotCanMove(coord, count, self._vecteurDirection[direction])
 		elif action in "mp":
-			return self.robotCanWork(coord, count, dd[direction], action in "m")
+			return self.robotCanWork(coord, count, self._vecteurDirection[direction], action in "m")
+
+	def buildWall(self, coord):
+		"""
+		fonction qui construit un mur au coord
+		donnée en paramètre
+		"""
+		lt = self.labyrinthe[coord]
+		if lt is not ".":
+			return False
+		else:
+			self.labyrinthe[coord] = "O"
+			return True
+
+	def buildDoor(self, coord):
+		"""
+		fonction qui construit une porte au coord
+		donnée en paramètre
+		"""
+		lt = self.labyrinthe[coord]
+		if lt is not "O":
+			return False
+		else:
+			self.labyrinthe[coord] = "."
+			return True
 
 	def __repr__(self):
 		return "<Carte {}>".format(self.nom)
 
 	def __str__(self):
-		return self.map
+		ret = ""
+		prevLine = 1
+		for key, val in self.labyrinthe.items():
+			x, y = key
+			ret += val
+		return ret
 
 	convStrToLabyrinthe = staticmethod(convStrToLabyrinthe)
