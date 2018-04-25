@@ -56,7 +56,7 @@ class Carte(RobotAction):
 		xv, yv = vector
 		for i in range(count + 1):
 			lt = self.labyrinthe[xr, yr]
-			if lt not in " " and lt not in "U":
+			if lt not in " U.":
 				return False
 			xr += xv
 			yr += yv

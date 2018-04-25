@@ -33,7 +33,7 @@ class Robot(RobotAction):
 		methode qui renvoie vraie si le robot a besoin de commande de la part de
 		l'utilisateur
 		"""
-		if self.action is None or self.direction is None or self.remain is 0 or
+		if self.action is None or self.direction is None or self.remain is 0 or\
 		carte.actionOk(self.coord, self.action, self.direction, self.remain) is False:
 			return True
 		return False
@@ -92,3 +92,6 @@ class Robot(RobotAction):
 		else:
 			carte.buildDoor(coord)
 		self.remain -= 1
+
+	def __str__(self):
+		return "<Robot {} {}>".format(self.identifient, self.coord)
