@@ -1,7 +1,6 @@
 import random
-from RobotAction import RobotAction
 
-class Carte(RobotAction):
+class Carte():
 
 	"""Objet de transition entre un fichier et un labyrinthe."""
 
@@ -111,6 +110,13 @@ class Carte(RobotAction):
 		else:
 			self.labyrinthe[coord] = "."
 			return True
+
+	def haveWin(self, coord):
+		"""
+		fonction qui renvoie vrai si les coordonnée donnée correspond
+		a celle d'une sortie
+		"""
+		return (self.labyrinthe[coord] is "U")
 
 	def __repr__(self):
 		return "<Carte {}>".format(self.nom)

@@ -1,7 +1,7 @@
 import os
 import sys
 import re
-from Carte import Carte
+from Class.Carte import Carte
 
 
 class Maps():

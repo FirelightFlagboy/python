@@ -1,6 +1,4 @@
-from RobotAction import RobotAction
-
-class Robot(RobotAction):
+class Robot():
 	"""
 	La classe robot:
 		- contient les coordonnées du robot
