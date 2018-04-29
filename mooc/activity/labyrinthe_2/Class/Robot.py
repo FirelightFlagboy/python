@@ -51,9 +51,12 @@ class Robot():
 		"""
 
 		if carte.actionOk(self.coord, self.action, self.direction) is False:
+			self.action = None
+			self.direction = None
+			self.remain = 0
 			return False
 
-		if self.action in "nsew":
+		if self.action in "nseo":
 			self.move()
 		elif self.action in "mp":
 			self.build(carte)

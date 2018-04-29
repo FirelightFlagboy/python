@@ -2,7 +2,6 @@ import time
 import socket
 import select
 import sys
-import utils
 import signal
 import os
 from threading import RLock
@@ -19,7 +18,10 @@ verrouDisplay = RLock()
 print("=================================================")
 print("  welcome")
 print("    commande :")
-print("      /say [message] : send message to all player")
+print("      /say [message]  : send message to all player")
+print("      /ls             : list all player connected")
+print("      /end            : quit the game")
+print("")
 print("  hote :", hote)
 print("  port :", port)
 print("=================================================")
@@ -29,6 +31,7 @@ def handler_sigint(n, stack):
 		readingTh.stop()
 		readingTh.join()
 	if client_connexion is not None:
+		client_connexion.send("/end".encode())
 		client_connexion.close()
 	sys.exit(0)
 
