@@ -25,8 +25,8 @@ class Serveur():
 		self.begin = False
 		self.round = 0
 
-		self.reg1 = r'^[nseo][0-9]*$'
-		self.reg2 = r'^[mp][nseo][0-9]*$'
+		self.reg1 = r'^[nseo]([1-9][0-9]*)?$'
+		self.reg2 = r'^[mp][nseo]([1-9][0-9]*)?$'
 		print("map choisi :\n{}\n".format(self.carte.__str__()))
 
 		print("setup the connexion ...")

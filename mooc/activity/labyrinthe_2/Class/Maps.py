@@ -12,7 +12,7 @@ class Maps():
 	def __init__(self, *args):
 		# regex pour verifier le contenue
 		self.ex_content = r"^[O.\nU ]+$"
-		self.ex_choice = r"^[0-9]+$"
+		self.ex_choice = r"^[1-9][0-9]+$"
 		# on peut preciser plusieur repertoire ou cherche les fichiers maps
 		self.dirToSearch = args
 		# variable qui seront initialiser plus tard
