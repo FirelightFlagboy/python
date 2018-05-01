@@ -39,7 +39,7 @@ class Serveur():
 
 	def __del__(self):
 		self.sendMessageToAll("la partie est terminer")
-		print("[Serveur ] : serveur will close\n")
+		print("[Serveur] : serveur will close\n")
 		for client in self.lstClient:
 			try:
 				client.send("end".encode())
@@ -47,15 +47,15 @@ class Serveur():
 			except Exception as e:
 				print(e)
 
-		print("[Serveur ] : all client connexion are now close\n")
-		print("[Serveur ] : now close main connexion and exit\n")
+		print("[Serveur] : all client connexion are now close\n")
+		print("[Serveur] : now close main connexion and exit\n")
 		self.mainConnexion.close()
 
 	def getClient(self):
 		"""
 		function qui obtient les client avant le debut de la partie
 		"""
-		print("\n[Serveur ] : now wait form client to connect ...\n")
+		print("\n[Serveur] : now wait form client to connect ...\n")
 		while self.begin is False:
 			# regarde pour de nouvel connexion
 			connexionW, _, _ = select.select([self.mainConnexion], [], [], 0.05)
@@ -70,16 +70,66 @@ class Serveur():
 				for client in  connexionR:
 					msgRcv = client.recv(1024)
 					msgRcv = msgRcv.decode()
-					print("[Serveur ] : from client {} : {}".format(self.lstClient.index(client) + 1, msgRcv))
+					print("[Serveur] : from client {} : {}".format(self.lstClient.index(client) + 1, msgRcv))
 					if msgRcv in "c":
 						if self.begin is False:
 							self.begin = True
 						else:
-							client.send("[Serveur ] : la partie a deja commencer".encode())
+							client.send("[Serveur] : la partie a deja commencer".encode())
 					else:
 						self.handleMsg(msgRcv, client)
-		print("\n[Serveur ] : all client are connected\n")
+		print("\n[Serveur] : all client are connected\n")
 		self.playGame()
+
+	def readClient(self, connexionRead):
+		"""
+		function qui lit les messages des clients
+		"""
+		for client in  connexionRead:
+			msgRcv = client.recv(1024)
+			msgRcv = msgRcv.decode()
+			print("[Serveur] : from client {} : {}".format(self.lstClient.index(client) + 1, msgRcv))
+			self.handleMsg(msgRcv, client)
+
+	def addClient(self, connexionWanted):
+		"""
+		function qui ajoute les clients
+		"""
+		for conn in connexionWanted:
+			connexion, info = conn.accept()
+			print("[Serveur] : client connected :", info)
+			# ajoute le client a la liste
+			self.lstClient.append(connexion)
+			# on choisi une zone aleatoire
+			x, y = self.carte.pickRandomLocation()
+			# on creer le nouveau robot
+			newRobot = Robot(x, y, "Robot-{}".format(len(self.lstRobot) + 1))
+			# on ajoute le robot a la liste
+			self.lstRobot.append(newRobot)
+			# on renvoie la map update a tout les clients
+			self.reSendMap()
+			# on envoie les infos au nouveau client
+			msg = "votre robot : " + newRobot.__str__()
+			connexion.send(msg.encode())
+
+	def removeClient(self, client):
+		"""
+		remove the client
+		"""
+		index = self.lstClient.index(client)
+		del self.lstClient[index]
+		del self.lstRobot[index]
+		print("[Serveur] : Player-{} disconnect".format(index + 1))
+		client.close()
+		self.reSendMap()
+		self.sendMessageToAll("Player-{} quit\n".format(index + 1))
+		if len(self.lstClient) > 0:
+			if self.round is index and index < len(self.lstClient):
+				self.lstClient[index].send("[Serveur] : its your turn\n".encode())
+			else:
+				self.lstClient[index - 1].send("[Serveur] : its your turn\n".encode())
+			if self.round >= index + 1:
+				self.round -= 1
 
 	def playGame(self):
 		"""
@@ -119,40 +169,9 @@ class Serveur():
 		connW, _, _ = select.select([self.mainConnexion], [], [], 0.05)
 		for c in connW:
 			sock, info = c.accept()
-			sock.send("[Serveur ] : la partie a commencer, bye!\n".encode())
+			sock.send("[Serveur] : la partie a commencer, bye!\n".encode())
 			sock.send("end".encode())
 			sock.close()
-
-	def readClient(self, connexionRead):
-		"""
-		function qui lit les messages des clients
-		"""
-		for client in  connexionRead:
-			msgRcv = client.recv(1024)
-			msgRcv = msgRcv.decode()
-			print("[Serveur ] : from client {} : {}".format(self.lstClient.index(client) + 1, msgRcv))
-			self.handleMsg(msgRcv, client)
-
-	def addClient(self, connexionWanted):
-		"""
-		function qui ajoute les clients
-		"""
-		for conn in connexionWanted:
-			connexion, info = conn.accept()
-			print("[Serveur ] : client connected :", info)
-			# ajoute le client a la liste
-			self.lstClient.append(connexion)
-			# on choisi une zone aleatoire
-			x, y = self.carte.pickRandomLocation()
-			# on creer le nouveau robot
-			newRobot = Robot(x, y, "player-{}".format(len(self.lstRobot) + 1))
-			# on ajoute le robot a la liste
-			self.lstRobot.append(newRobot)
-			# on renvoie la map update a tout les clients
-			self.reSendMap()
-			# on envoie les infos au nouveau client
-			msg = "votre robot : " + newRobot.__str__()
-			connexion.send(msg.encode())
 
 	def handleMsg(self, msg, client):
 		"""
@@ -169,8 +188,41 @@ class Serveur():
 			return self.handleMove(client, av[0])
 		if re.search(self.reg2, av[0]):
 			return self.handleBuild(client, av[0])
-		msg = "[Serveur ] : {} command not found".format(msg)
+		msg = "[Serveur] : {} command not found".format(msg)
 		client.send(msg.encode())
+
+	def handleBuild(self, client, msg):
+		"""
+		gere le construction
+		"""
+		if self.checkTurn(client) is False:
+			return False
+		ttype = msg[0]
+		direction, count = self.getDirAndCount(msg[1:])
+		index = self.lstClient.index(client)
+		msg = "[Serveur] : Build register\n"
+		msg += "type      : {}\n".format(ttype)
+		msg += "direction : {}\n".format(direction)
+		msg += "count     : {}\n".format(count)
+		client.send(msg.encode())
+		self.checkAction(client, self.lstRobot[index], ttype, direction, count)
+		return True
+
+	def handleMove(self, client, msg):
+		"""
+		gere les mouvements
+		"""
+		if self.checkTurn(client) is False:
+			return False
+		index = self.lstClient.index(client)
+		robot = self.lstRobot[index]
+		direction, count = self.getDirAndCount(msg)
+		msg = "[Serveur] : Mouvement register\n"
+		msg += "direction : {}\n".format(direction)
+		msg += "count     : {}\n".format(count)
+		client.send(msg.encode())
+		self.checkAction(client, robot, direction, direction, count)
+		return True
 
 	def checkTurn(self, client):
 		index = self.lstClient.index(client)
@@ -211,59 +263,26 @@ class Serveur():
 			client.send("[Serveur] : Mouvement enregistrer\n".encode())
 			robot = robot.setMovement(ttype, direction, count)
 
-	def handleBuild(self, client, msg):
+	def addRobotToMap(self, main_robot):
 		"""
-		gere le construction
+		function qui ajoute le robot a la map
 		"""
-		if self.checkTurn(client) is False:
-			return False
-		ttype = msg[0]
-		direction, count = self.getDirAndCount(msg[1:])
-		index = self.lstClient.index(client)
-		msg = "[Serveur] : Build register\n"
-		msg += "type      : {}\n".format(ttype)
-		msg += "direction : {}\n".format(direction)
-		msg += "count     : {}\n".format(count)
-		client.send(msg.encode())
-		self.checkAction(client, self.lstRobot[index], ttype, direction, count)
-		return True
-
-	def handleMove(self, client, msg):
-		"""
-		gere les mouvements
-		"""
-		if self.checkTurn(client) is False:
-			return False
-		index = self.lstClient.index(client)
-		robot = self.lstRobot[index]
-		direction, count = self.getDirAndCount(msg)
-		msg = "[Serveur] : Mouvement register\n"
-		msg += "direction : {}\n".format(direction)
-		msg += "count     : {}\n".format(count)
-		client.send(msg.encode())
-		self.checkAction(client, robot, direction, direction, count)
-		return True
-
-	def removeClient(self, client):
-		"""
-		remove the client
-		"""
-		index = self.lstClient.index(client)
-		del self.lstClient[index]
-		del self.lstRobot[index]
-		client.close()
-		self.reSendMap()
-		self.sendMessageToAll("Player-{} quit\n".format(index + 1))
-		if len(self.lstClient) > 0:
-			self.lstClient[index].send("[Serveur] : its your turn\n".encode())
+		save = dict(self.carte.labyrinthe)
+		lab = self.carte.labyrinthe
+		for robot in self.lstRobot:
+			lab[robot.coord] = "x"
+		lab[main_robot.coord] = "X"
+		chaine = self.carte.__str__()
+		self.carte.labyrinthe = save
+		return chaine
 
 	def sendListPlayer(self, client):
 		"""
 		envoie la list des clients connecter
 		"""
 		msg = "[Serveur] :\n"
-		for rob in self.lstRobot:
-			msg += rob.__str__() + "\n"
+		for i, rob in enumerate(self.lstRobot):
+			msg += "Player-{} : ".format(i + 1) + rob.__str__() + "\n"
 		msg += "\nyou are the Player-{}".format(self.lstClient.index(client) + 1)
 		client.send(msg.encode())
 
@@ -281,7 +300,7 @@ class Serveur():
 		function qui envoie un message a tout les clients
 		"""
 		msg = ' '.join(av[1:])
-		res = "[Serveur ] : your msg : {} : have been send".format(msg)
+		res = "[Serveur] : your msg : {} : have been send".format(msg)
 		msg = "[Player-{}] : {}".format(self.lstClient.index(client) + 1, msg)
 		msg = msg.encode()
 		for c in self.lstClient:
@@ -296,16 +315,3 @@ class Serveur():
 		for rob, cli in zip(self.lstRobot, self.lstClient):
 			msg = self.addRobotToMap(rob)
 			cli.send(msg.encode())
-
-	def addRobotToMap(self, main_robot):
-		"""
-		function qui ajoute le robot a la map
-		"""
-		save = dict(self.carte.labyrinthe)
-		lab = self.carte.labyrinthe
-		for robot in self.lstRobot:
-			lab[robot.coord] = "x"
-		lab[main_robot.coord] = "X"
-		chaine = self.carte.__str__()
-		self.carte.labyrinthe = save
-		return chaine

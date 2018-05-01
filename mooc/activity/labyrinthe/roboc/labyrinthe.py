@@ -29,7 +29,7 @@ class Labyrinthe:
 			if a != colonne:
 				chaine += "\n"
 				colonne = a
-			
+
 			#quand on trouve le robot on verifie si il est bien a la bonne position
 			if pos == self.robot:
 				val = "X"
@@ -51,7 +51,7 @@ class Labyrinthe:
 		for i in range(nbRep):
 			#si la voie est libre, on bouge
 			self.canMove(direction)
-			
+
 
 	def canMove(self,direction):
 		"""test si le robot peut se deplacer dans la dite direction"""
@@ -71,20 +71,20 @@ class Labyrinthe:
 
 		#si on veut aller vers l'est
 		elif direction in "e":
-			y -= 1
-			if self.grille[x, y] is not "O":
-				self.robot = (x, y)
-			
-		#si on veut aller vers l'ouest
-		elif direction in "w":
 			y += 1
 			if self.grille[x, y] is not "O":
 				self.robot = (x, y)
-				
+
+		#si on veut aller vers l'ouest
+		elif direction in "o":
+			y -= 1
+			if self.grille[x, y] is not "O":
+				self.robot = (x, y)
+
 
 	def RobotOnExit(self):
 		"""verifie si le robot ce trouve sur la porte de sortie"""
 		if self.robot == self.exit:
 			return True
-		else: 
+		else:
 			return False

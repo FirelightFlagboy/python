@@ -54,7 +54,7 @@ read input from user
 print(">> ", end='')
 while True:
 	msg = input("")
-	client_connexion.send(msg.encode())
+	client_connexion.send(msg.lower().encode())
 
 readingTh.join()
 client_connexion.close()
